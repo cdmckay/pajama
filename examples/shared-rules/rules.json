@@ -1,10 +1,6 @@
 {
-    "first_name":{
-        "required":true
-    },
-    "last_name":{
-        "required":true
-    },
+    "first_name":"required",
+    "last_name":"required",
     "password_1":{
         "required":true,
         "minlength":5,

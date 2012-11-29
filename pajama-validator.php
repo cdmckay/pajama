@@ -9,6 +9,21 @@ class PajamaValidator {
     protected function __construct($model, $rules) {
         $this->model = $model;
         $this->rules = $rules;
+        foreach ($this->rules as $name => $value) {
+            $this->rules[$name] = $this->normalizeValue($value);
+        }
+    }
+
+    private function normalizeValue($value) {
+        $normalized_value = $value;
+        if (is_string($value)) {
+            $normalized_value = array();
+            $method_names = preg_split('/\s/', $value);
+            foreach ($method_names as $method_name) {
+                $normalized_value[$method_name] = true;
+            }
+        }
+        return $normalized_value;
     }
 
     public static function validate($options) {
@@ -25,6 +40,19 @@ class PajamaValidator {
 
     public static function optional($value) {
         return is_null($value) || $value === "";
+    }
+
+    public function depend($param, $value) {
+        $result = null;
+        if (is_bool($param)) {
+            $result = $param;
+        } else if (is_string($param)) {
+            // Do nothing.  We don't want strings recognized as a callable because we might use this
+            // later for checking name dependencies.
+        } else if (is_callable($param)) {
+            $result = $param($this->model, $value);
+        }
+        return $result;
     }
 
     public function model() {
@@ -68,27 +96,27 @@ class PajamaValidator {
 
 }
 
-PajamaValidator::addMethod('required', function($validator, $value, $param) {
-    $required = is_bool($param) ? $param : $param();
+PajamaValidator::addMethod('required', function(PajamaValidator $validator, $value, $param) {
+    $required = $validator->depend($param, $value);
     return $required ? !$validator::optional($value) : true;
 });
 
-PajamaValidator::addMethod('minlength', function($validator, $value, $param) {
+PajamaValidator::addMethod('minlength', function(PajamaValidator $validator, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
     return $validator::optional($value) ?: $length >= $param;
 });
 
-PajamaValidator::addMethod('maxlength', function($validator, $value, $param) {
+PajamaValidator::addMethod('maxlength', function(PajamaValidator $validator, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
     return $validator::optional($value) ?: $length <= $param;
 });
 
-PajamaValidator::addMethod('rangelength', function($validator, $value, $param) {
+PajamaValidator::addMethod('rangelength', function(PajamaValidator $validator, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
     return $validator::optional($value) ?: $length >= $param[0] && $length <= $param[1];
 });
 
-PajamaValidator::addMethod('equalTo', function($validator, $value, $param) {
+PajamaValidator::addMethod('equalTo', function(PajamaValidator $validator, $value, $param) {
     // The parameter must not be empty, must be at least 2 characters, and start with a #.
     if ($validator::optional($param) || strlen($param) === 1 || $param[0] !== "#") {
         return true;
