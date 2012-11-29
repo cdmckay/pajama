@@ -1,0 +1,18 @@
+{
+    "first_name":{
+        "required":true
+    },
+    "last_name":{
+        "required":true
+    },
+    "password_1":{
+        "required":true,
+        "minlength":5,
+        "equalTo":"#password_2"
+    },
+    "password_2":{
+        "required":true,
+        "minlength":5,
+        "equalTo":"#password_1"
+    }
+}
