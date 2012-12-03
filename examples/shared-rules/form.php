@@ -60,6 +60,10 @@
                     <td><input type="text" name="rating" id="rating" /></td>
                 </tr>
                 <tr>
+                    <th><label for="md5_hash">MD5 Hash</label></th>
+                    <td><input type="text" name="md5_hash" id="md5_hash" /></td>
+                </tr>
+                <tr>
                     <th><label for="skip_client_validation">Skip Client Validation</label></th>
                     <td><input type="checkbox" name="skip_client_validation" id="skip_client_validation"/></td>
                 </tr>

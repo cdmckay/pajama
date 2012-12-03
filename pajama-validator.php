@@ -183,33 +183,33 @@ Validator::addMethod('required', function(ValidatorContext $context, $value, $pa
 
 Validator::addMethod('minlength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $context->optional($value) ?: $length >= $param;
+    return $context->optional($value) || $length >= $param;
 });
 
 Validator::addMethod('maxlength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $context->optional($value) ?: $length <= $param;
+    return $context->optional($value) || $length <= $param;
 });
 
 Validator::addMethod('rangelength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $context->optional($value) ?: $length >= $param[0] && $length <= $param[1];
+    return $context->optional($value) || $length >= $param[0] && $length <= $param[1];
 });
 
 Validator::addMethod('min', function(ValidatorContext $context, $value, $param) {
-    return $context->optional($value) ?: $value >= $param;
+    return $context->optional($value) || $value >= $param;
 });
 
 Validator::addMethod('max', function(ValidatorContext $context, $value, $param) {
-    return $context->optional($value) ?: $value <= $param;
+    return $context->optional($value) || $value <= $param;
 });
 
 Validator::addMethod('range', function(ValidatorContext $context, $value, $param) {
-    return $context->optional($value) ?: $value >= $param[0] && $value <= $param[1];
+    return $context->optional($value) || $value >= $param[0] && $value <= $param[1];
 });
 
 Validator::addMethod('email', function(ValidatorContext $context, $value) {
-    return $context->optional($value) ?: filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    return $context->optional($value) || filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
 });
 
 Validator::addMethod('url', function(ValidatorContext $context, $value) {
@@ -226,19 +226,19 @@ Validator::addMethod('url', function(ValidatorContext $context, $value) {
 });
 
 Validator::addMethod('date', function(ValidatorContext $context, $value) {
-    return $context->optional($value) ?: strtotime($value) !== false;
+    return $context->optional($value) || strtotime($value) !== false;
 });
 
 Validator::addMethod('dateISO', function(ValidatorContext $context, $value) {
-    return $context->optional($value) ?: preg_match('/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/', $value);
+    return $context->optional($value) || preg_match('/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/', $value);
 });
 
 Validator::addMethod('number', function(ValidatorContext $context, $value) {
-    return $context->optional($value) ?: is_numeric($value);
+    return $context->optional($value) || is_numeric($value);
 });
 
 Validator::addMethod('digits', function(ValidatorContext $context, $value) {
-    return $context->optional($value) ?: preg_match('/^\d+$/', $value);
+    return $context->optional($value) || preg_match('/^\d+$/', $value);
 });
 
 Validator::addMethod('creditcard', function(ValidatorContext $context, $value) {

@@ -21,7 +21,7 @@
         "email":true,
         "equalTo":"[name=email_1]"
     },
-    "birth_date":"date",
+    "birth_date":"dateISO",
     "url":{
         "url":true
     },
@@ -33,5 +33,9 @@
     },
     "rating":{
         "range":[1, 100]
+    },
+    "md5_hash":{
+        "alphanumeric":true,
+        "rangelength":[32, 32]
     }
 }

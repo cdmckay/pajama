@@ -1,5 +1,9 @@
 jQuery(document).ready(function($) {
 
+    $.validator.addMethod("alphanumeric", function(value, element) {
+        return this.optional(element) || /^[a-z0-9]+$/i.test(value);
+    }, "This field must contain only letters and numbers.");
+
     var form = $("form").on("submit", function() {
         // While rules are loading, make sure form is not submittable.
         return false;
