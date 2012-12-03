@@ -33,11 +33,11 @@
                 </tr>
                 <tr>
                     <th><label for="email_1">Email</label></th>
-                    <td><input type="text" name="email_1" id="email_1" /></td>
+                    <td><input type="text" name="email[1]" id="email_1" /></td>
                 </tr>
                 <tr>
                     <th><label for="email_2">Confirm Email</label></th>
-                    <td><input type="text" name="email_2" id="email_2" /></td>
+                    <td><input type="text" name="email[2]" id="email_2" /></td>
                 </tr>
                 <tr>
                     <th><label for="birth_date">Birth Date</label></th>

@@ -2,15 +2,15 @@
 
 namespace Pajama;
 
-class Validator {
+final class Validator {
 
-    protected $model;
-    protected $rules;
-    protected $context;
-    protected static $methods = array();
+    private $model;
+    private $rules;
+    private $context;
+    private static $methods = array();
 
-    protected function __construct($model, $rules) {
-        $this->model = $model;
+    private function __construct($model, $rules) {
+        $this->model = self::flatten($model);
         $this->rules = $this->normalizeRules($rules);
         $this->context = new ValidatorContext($this);
     }
@@ -73,18 +73,18 @@ class Validator {
         return $valid;
     }
 
-    public function invalids($model) {
+    public function invalids() {
         $invalids = array();
         foreach ($this->rules as $name => $rule) {
-            if (!$this->field($model, $name)) {
+            if (!$this->field($this->model, $name)) {
                 $invalids[] = $name;
             }
         }
         return $invalids;
     }
 
-    public function numberOfInvalids($model) {
-        return count($this->invalids($model));
+    public function numberOfInvalids() {
+        return count($this->invalids($this->model));
     }
 
     public function getModel() {
@@ -95,9 +95,26 @@ class Validator {
         return $this->rules;
     }
 
+    private static function flatten($model) {
+        $repeat = false;
+        foreach ($model as $name => $value) {
+            if (is_array($value)) {
+                $repeat = true;
+                foreach ($value as $sub_name => $sub_value) {
+                    $model["{$name}[$sub_name]"] = $sub_value;
+                }
+                unset($model[$name]);
+            }
+        }
+        if ($repeat) {
+            $model = self::flatten($model);
+        }
+        return $model;
+    }
+
 }
 
-class ValidatorContext {
+final class ValidatorContext {
 
     private $validator;
 
@@ -110,9 +127,10 @@ class ValidatorContext {
     }
 
     public function parseSelector($selector) {
+        $selector = str_replace(array('\[', '\]'), array('[', ']'), $selector);
         $result = null;
-        if (preg_match('/^#([A-Za-z][\w\-]*)(:\w+)?$/', $selector, $matches) ||
-            preg_match('/^\[name=([\w\-]+)\](:\w+)?$/', $selector, $matches)) {
+        if (preg_match('/^#([A-Za-z][\w\-\.]*)(:\w+)?$/', $selector, $matches) ||
+            preg_match('/^\[name=([\w\-\.\[\]]+)\](:\w+)?$/', $selector, $matches)) {
             $result = array(
                 'name' => $matches[1],
                 'pseudo-class' => $matches[2],

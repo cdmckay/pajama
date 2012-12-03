@@ -11,15 +11,15 @@
         "minlength":5,
         "equalTo":"#password_1"
     },
-    "email_1":{
+    "email[1]":{
         "required":"#send_email_updates:checked",
         "email":true,
-        "equalTo":"[name=email_2]"
+        "equalTo":"[name=email\\[2\\]]"
     },
-    "email_2":{
+    "email[2]":{
         "required":"#send_email_updates:checked",
         "email":true,
-        "equalTo":"[name=email_1]"
+        "equalTo":"[name=email\\[1\\]]"
     },
     "birth_date":"dateISO",
     "url":{
