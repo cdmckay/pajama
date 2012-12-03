@@ -52,15 +52,6 @@ class Validator {
         self::$methods[$method_name] = $method;
     }
 
-    public function model() {
-        $valid = true;
-        foreach ($this->rules as $name => $rule) {
-            $valid = $valid && $this->field($name);
-            if (!$valid) break;
-        }
-        return $valid;
-    }
-
     public function field($name) {
         $value = $this->model[$name];
         $rule = $this->rules[$name];
@@ -73,14 +64,27 @@ class Validator {
         return $valid;
     }
 
-    public function numberOfInvalids($model) {
-        $count = 0;
+    public function model() {
+        $valid = true;
+        foreach ($this->rules as $name => $rule) {
+            $valid = $valid && $this->field($name);
+            if (!$valid) break;
+        }
+        return $valid;
+    }
+
+    public function invalids($model) {
+        $invalids = array();
         foreach ($this->rules as $name => $rule) {
             if (!$this->field($model, $name)) {
-                $count++;
+                $invalids[] = $name;
             }
         }
-        return $count;
+        return $invalids;
+    }
+
+    public function numberOfInvalids($model) {
+        return count($this->invalids($model));
     }
 
     public function getModel() {
