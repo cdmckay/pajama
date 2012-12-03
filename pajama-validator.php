@@ -1,20 +1,34 @@
 <?php
 
-class PajamaValidator {
+namespace Pajama;
+
+class Validator {
 
     protected $model;
     protected $rules;
+    protected $context;
     protected static $methods = array();
 
     protected function __construct($model, $rules) {
         $this->model = $model;
-        $this->rules = $rules;
-        foreach ($this->rules as $name => $value) {
-            $this->rules[$name] = $this->normalizeValue($value);
-        }
+        $this->rules = $this->normalizeRules($rules);
+        $this->context = new ValidatorContext($this);
     }
 
-    private function normalizeValue($value) {
+    private function normalizeRules($rules) {
+        foreach ($rules as $field => $rule) {
+            $normalized_rule = $this->normalizeRule($rule);
+            foreach ($normalized_rule as $method_name => $param) {
+                if ($param === false) {
+                    unset($normalized_rule[$method_name]);
+                }
+            }
+            $rules[$field] = $normalized_rule;
+        }
+        return $rules;
+    }
+
+    private function normalizeRule($value) {
         $normalized_value = $value;
         if (is_string($value)) {
             $normalized_value = array();
@@ -27,7 +41,7 @@ class PajamaValidator {
     }
 
     public static function validate($options) {
-        return new PajamaValidator($options['model'], $options['rules']);
+        return new Validator($options['model'], $options['rules']);
     }
 
     public static function getMethods() {
@@ -36,23 +50,6 @@ class PajamaValidator {
 
     public static function addMethod($method_name, $method) {
         self::$methods[$method_name] = $method;
-    }
-
-    public static function optional($value) {
-        return is_null($value) || $value === "";
-    }
-
-    public function depend($param, $value) {
-        $result = null;
-        if (is_bool($param)) {
-            $result = $param;
-        } else if (is_string($param)) {
-            // Do nothing.  We don't want strings recognized as a callable because we might use this
-            // later for checking name dependencies.
-        } else if (is_callable($param)) {
-            $result = $param($this->model, $value);
-        }
-        return $result;
     }
 
     public function model() {
@@ -70,7 +67,7 @@ class PajamaValidator {
         $valid = true;
         foreach ($rule as $method_name => $param) {
             $method = self::$methods[$method_name];
-            $valid = $valid && (is_null($method) || $method($this, $value, $param));
+            $valid = $valid && (is_null($method) || $method($this->context, $value, $param));
             if (!$valid) break;
         }
         return $valid;
@@ -96,33 +93,113 @@ class PajamaValidator {
 
 }
 
-PajamaValidator::addMethod('required', function(PajamaValidator $validator, $value, $param) {
-    $required = $validator->depend($param, $value);
-    return $required ? !$validator::optional($value) : true;
+class ValidatorContext {
+
+    private $validator;
+
+    public function __construct(Validator $validator) {
+        $this->validator = $validator;
+    }
+
+    public static function optional($value) {
+        return is_null($value) || $value === "";
+    }
+
+    public function resolve($value, $param) {
+        $result = false;
+        if (is_bool($param)) {
+            $result = $param;
+        } else if (is_string($param)) {
+            $result = $this->resolveSelector($param);
+        } else if (is_callable($param)) {
+            $result = $param($this->validator->getModel(), $value);
+        }
+        return $result;
+    }
+
+    public function resolveSelector($selector) {
+        // Should support:
+        // #X
+        // [name=X]
+        // with
+        // :checked
+        // :unchecked
+        // :filled
+        // :blank
+        $result = false;
+        $matches = array();
+        if (preg_match('/^#([A-Za-z][\w\-]*)(:\w+)?$/', $selector, $matches) ||
+            preg_match('/^\[name=([\w\-]+)\](:\w+)?$/', $selector, $matches)) {
+            list(, $name, $pseudo_class) = $matches;
+            $model = $this->validator->getModel();
+            switch ($matches[2]) {
+                case "checked":
+                    $result = array_key_exists($name, $model);
+                    break;
+                case "unchecked":
+                    $result = !array_key_exists($name, $model);
+                    break;
+                case "filled":
+                    $result = array_key_exists($name, $model) && strlen($model[$name]) > 0;
+                    break;
+                case "blank":
+                    $result = array_key_exists($name, $model) && strlen($model[$name]) === 0;
+                    break;
+                case null:
+                    // No selector.
+                    $result = array_key_exists($name, $model);
+                    break;
+                default:
+                    // Unsupported selector.
+                    $result = array_key_exists($name, $model);
+                    break;
+            }
+        }
+        return $result;
+    }
+
+    public function getValidator() {
+        return $this->validator;
+    }
+
+}
+
+Validator::addMethod('required', function(ValidatorContext $context, $value, $param) {
+    $required = $context->resolve($value, $param);
+    return $required ? !$context::optional($value) : true;
 });
 
-PajamaValidator::addMethod('minlength', function(PajamaValidator $validator, $value, $param) {
+Validator::addMethod('minlength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $validator::optional($value) ?: $length >= $param;
+    return $context::optional($value) ?: $length >= $param;
 });
 
-PajamaValidator::addMethod('maxlength', function(PajamaValidator $validator, $value, $param) {
+Validator::addMethod('maxlength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $validator::optional($value) ?: $length <= $param;
+    return $context::optional($value) ?: $length <= $param;
 });
 
-PajamaValidator::addMethod('rangelength', function(PajamaValidator $validator, $value, $param) {
+Validator::addMethod('rangelength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $validator::optional($value) ?: $length >= $param[0] && $length <= $param[1];
+    return $context::optional($value) ?: $length >= $param[0] && $length <= $param[1];
 });
 
-PajamaValidator::addMethod('equalTo', function(PajamaValidator $validator, $value, $param) {
+Validator::addMethod('email', function(ValidatorContext $context, $value) {
+    return $context::optional($value) ?: filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+});
+
+Validator::addMethod('url', function(ValidatorContext $context, $value) {
+    return $context::optional($value) ?: filter_var($value, FILTER_VALIDATE_URL) !== false;
+});
+
+Validator::addMethod('equalTo', function(ValidatorContext $context, $value, $param) {
     // The parameter must not be empty, must be at least 2 characters, and start with a #.
-    if ($validator::optional($param) || strlen($param) === 1 || $param[0] !== "#") {
+    // TODO Make this work with [name=X] as well.
+    if ($context::optional($param) || strlen($param) === 1 || $param[0] !== "#") {
         return true;
     }
 
-    $model = $validator->getModel();
+    $model = $context->getValidator()->getModel();
     $name = substr($param, 1);
     return $value === $model[$name];
 });

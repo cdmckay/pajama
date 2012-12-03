@@ -28,6 +28,18 @@
                     <td><input type="password" name="password_2" id="password_2" /></td>
                 </tr>
                 <tr>
+                    <th><label for="send_email_updates">Send Email Updates</label></th>
+                    <td><input type="checkbox" name="send_email_updates" id="send_email_updates" /></td>
+                </tr>
+                <tr>
+                    <th><label for="email_1">Email</label></th>
+                    <td><input type="text" name="email_1" id="email_1" /></td>
+                </tr>
+                <tr>
+                    <th><label for="email_2">Confirm Email</label></th>
+                    <td><input type="text" name="email_2" id="email_2" /></td>
+                </tr>
+                <tr>
                     <th><label for="skip_javascript_validation">Skip JavaScript Validation</label></th>
                     <td><input type="checkbox" name="skip_javascript_validation" id="skip_javascript_validation"/></td>
                 </tr>

@@ -10,5 +10,15 @@
         "required":true,
         "minlength":5,
         "equalTo":"#password_1"
+    },
+    "email_1":{
+        "required":"#send_email_updates:checked",
+        "email":true,
+        "equalTo":"[name=email_2]"
+    },
+    "email_2":{
+        "required":"#send_email_updates:checked",
+        "email":true,
+        "equalTo":"[name=email_1]"
     }
 }
