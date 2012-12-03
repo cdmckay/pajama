@@ -21,6 +21,7 @@
         "email":true,
         "equalTo":"[name=email_1]"
     },
+    "birth_date":"date",
     "url":{
         "url":true
     },

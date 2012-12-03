@@ -225,8 +225,46 @@ Validator::addMethod('url', function(ValidatorContext $context, $value) {
     return $has_permitted_protocol && filter_var($value, FILTER_VALIDATE_URL) !== false;
 });
 
+Validator::addMethod('date', function(ValidatorContext $context, $value) {
+    return $context->optional($value) ?: strtotime($value) !== false;
+});
+
+Validator::addMethod('dateISO', function(ValidatorContext $context, $value) {
+    return $context->optional($value) ?: preg_match('/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/', $value);
+});
+
+Validator::addMethod('number', function(ValidatorContext $context, $value) {
+    return $context->optional($value) ?: is_numeric($value);
+});
+
+Validator::addMethod('digits', function(ValidatorContext $context, $value) {
+    return $context->optional($value) ?: preg_match('/^\d+$/', $value);
+});
+
+Validator::addMethod('creditcard', function(ValidatorContext $context, $value) {
+    if ($context->optional($value)) {
+        return true;
+    }
+    if (preg_match('/[^0-9 \-]+/', $value)) {
+        return false;
+    }
+
+    $value = preg_replace('/\/D/', '', $value);
+    $check = 0;
+    $even = false;
+    for ($n = strlen($value) - 1; $n >= 0; $n--) {
+        $digit = intval($value[$n]);
+        if ($even && ($digit *= 2) > 9) {
+            $digit -= 9;
+        }
+        $check += $digit;
+        $even = !$even;
+    }
+    return ($check % 10) === 0;
+});
+
 Validator::addMethod('equalTo', function(ValidatorContext $context, $value, $param) {
-    if ($context->optional($param)) {
+    if ($context->optional($value)) {
         return true;
     }
 
@@ -239,6 +277,4 @@ Validator::addMethod('equalTo', function(ValidatorContext $context, $value, $par
     }
     return $valid;
 });
-
-
 

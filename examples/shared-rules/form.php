@@ -40,6 +40,10 @@
                     <td><input type="text" name="email_2" id="email_2" /></td>
                 </tr>
                 <tr>
+                    <th><label for="birth_date">Birth Date</label></th>
+                    <td><input type="text" name="birth_date" id="birth_date" /></td>
+                </tr>
+                <tr>
                     <th><label for="url">Website URL</label></th>
                     <td><input type="text" name="url" id="url" /></td>
                 </tr>
