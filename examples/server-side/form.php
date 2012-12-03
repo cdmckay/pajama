@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Simple Example</title>
+    <title>Standalone Example</title>
     <link type="text/css" href="form.css" rel="stylesheet" />
 </head>
 <body>

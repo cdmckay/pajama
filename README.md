@@ -1,11 +1,15 @@
 Pajama Validator
 ================
 
-The Pajama Validator provides drop-in server-side validation for your existing [jQuery Validation Plugin](http://bassistance.de/jquery-plugins/jquery-plugin-validation/) forms.
+The Pajama Validator provides drop-in server-side validation for your existing [jQuery Validation plugin](http://bassistance.de/jquery-plugins/jquery-plugin-validation/) forms.
 It can also be used for standalone server-side validation in a pinch.
 
-Since the goal of the Pajama Validator was to be used with the jQuery Validation Plugin (JQVP), the API has been designed to
-be similar and thus familiar to developers who already know how to use the JQVP.
+Since the goal of the Pajama Validator was to be used with the jQuery Validation plugin, the API has been designed to
+be similar and thus familiar to developers who already know how to use the jQuery Validation plugin.
+
+## Getting Started (jQuery Validation integration)
+
+This will be filled in soon.
 
 ## Getting Started (standalone)
 
@@ -41,8 +45,11 @@ if($validator->model()) {
 }
 ```
 
-Also see the `server-side` example in the `examples` folder.
+See the `standalone` example in the `examples` folder.
 
-## Getting Started (jQuery Validation Plugin integration)
+## Custom Validators
 
-This will be filled in soon.
+## API Similarities
+
+## Limitations
+

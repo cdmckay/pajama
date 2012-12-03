@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Shared Rules Example</title>
+    <title>jQuery Validation Integration Example</title>
     <link type="text/css" href="form.css" rel="stylesheet" />
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="jquery.validate.js"></script>
