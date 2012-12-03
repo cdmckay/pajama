@@ -1,5 +1,5 @@
-Pajama Validator - Client-Server Form Validation
-================================================
+Pajama Validator
+================
 
 The Pajama Validator provides drop-in server-side validation for your existing [jQuery Validation Plugin](http://bassistance.de/jquery-plugins/jquery-plugin-validation/) forms.
 It can also be used for standalone server-side validation in a pinch.
