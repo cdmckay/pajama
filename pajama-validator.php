@@ -101,8 +101,20 @@ class ValidatorContext {
         $this->validator = $validator;
     }
 
-    public static function optional($value) {
+    public function optional($value) {
         return is_null($value) || $value === "";
+    }
+
+    public function parseSelector($selector) {
+        $result = null;
+        if (preg_match('/^#([A-Za-z][\w\-]*)(:\w+)?$/', $selector, $matches) ||
+            preg_match('/^\[name=([\w\-]+)\](:\w+)?$/', $selector, $matches)) {
+            $result = array(
+                'name' => $matches[1],
+                'pseudo-class' => $matches[2],
+            );
+        }
+        return $result;
     }
 
     public function resolve($value, $param) {
@@ -110,29 +122,29 @@ class ValidatorContext {
         if (is_bool($param)) {
             $result = $param;
         } else if (is_string($param)) {
-            $result = $this->resolveSelector($param);
+            $result = $this->resolveExpression($param);
         } else if (is_callable($param)) {
             $result = $param($this->validator->getModel(), $value);
         }
         return $result;
     }
 
-    public function resolveSelector($selector) {
-        // Should support:
+    public function resolveExpression($expression) {
+        // Supports the selectors:
         // #X
         // [name=X]
-        // with
+        // with pseudo-classes:
         // :checked
         // :unchecked
         // :filled
         // :blank
         $result = false;
-        $matches = array();
-        if (preg_match('/^#([A-Za-z][\w\-]*)(:\w+)?$/', $selector, $matches) ||
-            preg_match('/^\[name=([\w\-]+)\](:\w+)?$/', $selector, $matches)) {
-            list(, $name, $pseudo_class) = $matches;
+        $parts = $this->parseSelector($expression);
+        if ($parts !== null) {
+            $name = $parts['name'];
+            $pseudo_class = $parts['pseudo-class'];
             $model = $this->validator->getModel();
-            switch ($matches[2]) {
+            switch ($pseudo_class) {
                 case "checked":
                     $result = array_key_exists($name, $model);
                     break;
@@ -146,11 +158,11 @@ class ValidatorContext {
                     $result = array_key_exists($name, $model) && strlen($model[$name]) === 0;
                     break;
                 case null:
-                    // No selector.
+                    // No pseudo-class.
                     $result = array_key_exists($name, $model);
                     break;
                 default:
-                    // Unsupported selector.
+                    // Unsupported pseudo-class.
                     $result = array_key_exists($name, $model);
                     break;
             }
@@ -166,41 +178,67 @@ class ValidatorContext {
 
 Validator::addMethod('required', function(ValidatorContext $context, $value, $param) {
     $required = $context->resolve($value, $param);
-    return $required ? !$context::optional($value) : true;
+    return $required ? !$context->optional($value) : true;
 });
 
 Validator::addMethod('minlength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $context::optional($value) ?: $length >= $param;
+    return $context->optional($value) ?: $length >= $param;
 });
 
 Validator::addMethod('maxlength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $context::optional($value) ?: $length <= $param;
+    return $context->optional($value) ?: $length <= $param;
 });
 
 Validator::addMethod('rangelength', function(ValidatorContext $context, $value, $param) {
     $length = is_array($value) ? count($value) : strlen($value);
-    return $context::optional($value) ?: $length >= $param[0] && $length <= $param[1];
+    return $context->optional($value) ?: $length >= $param[0] && $length <= $param[1];
+});
+
+Validator::addMethod('min', function(ValidatorContext $context, $value, $param) {
+    return $context->optional($value) ?: $value >= $param;
+});
+
+Validator::addMethod('max', function(ValidatorContext $context, $value, $param) {
+    return $context->optional($value) ?: $value <= $param;
+});
+
+Validator::addMethod('range', function(ValidatorContext $context, $value, $param) {
+    return $context->optional($value) ?: $value >= $param[0] && $value <= $param[1];
 });
 
 Validator::addMethod('email', function(ValidatorContext $context, $value) {
-    return $context::optional($value) ?: filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    return $context->optional($value) ?: filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
 });
 
 Validator::addMethod('url', function(ValidatorContext $context, $value) {
-    return $context::optional($value) ?: filter_var($value, FILTER_VALIDATE_URL) !== false;
-});
-
-Validator::addMethod('equalTo', function(ValidatorContext $context, $value, $param) {
-    // The parameter must not be empty, must be at least 2 characters, and start with a #.
-    // TODO Make this work with [name=X] as well.
-    if ($context::optional($param) || strlen($param) === 1 || $param[0] !== "#") {
+    if ($context->optional($value)) {
         return true;
     }
 
-    $model = $context->getValidator()->getModel();
-    $name = substr($param, 1);
-    return $value === $model[$name];
+    $has_permitted_protocol =
+        substr($value, 0, 4) === 'http'  ||
+        substr($value, 0, 5) === 'https' ||
+        substr($value, 0, 3) === 'ftp';
+
+    return $has_permitted_protocol && filter_var($value, FILTER_VALIDATE_URL) !== false;
 });
+
+Validator::addMethod('equalTo', function(ValidatorContext $context, $value, $param) {
+    if ($context->optional($param)) {
+        return true;
+    }
+
+    $valid = false;
+    $parts = $context->parseSelector($param);
+    if ($parts !== null) {
+        $name = $parts['name'];
+        $model = $context->getValidator()->getModel();
+        $valid = $value === $model[$name];
+    }
+    return $valid;
+});
+
+
 

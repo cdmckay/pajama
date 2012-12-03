@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
             form.off("submit");
 
             form.on("submit", function() {
-                var skip = form.find("#skip_javascript_validation").is(":checked");
+                var skip = form.find("#skip_client_validation").is(":checked");
                 if (skip || validator.form()) {
                     // Disable the submit button while posting.
                     var submit = form.find(":submit").attr("disabled", "disabled");

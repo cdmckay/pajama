@@ -40,8 +40,24 @@
                     <td><input type="text" name="email_2" id="email_2" /></td>
                 </tr>
                 <tr>
-                    <th><label for="skip_javascript_validation">Skip JavaScript Validation</label></th>
-                    <td><input type="checkbox" name="skip_javascript_validation" id="skip_javascript_validation"/></td>
+                    <th><label for="url">Website URL</label></th>
+                    <td><input type="text" name="url" id="url" /></td>
+                </tr>
+                <tr>
+                    <th><label for="temperature">Temperature (in &deg;C)</label></th>
+                    <td><input type="text" name="temperature" id="temperature" /></td>
+                </tr>
+                <tr>
+                    <th><label for="speed">Speed (in m/s)</label></th>
+                    <td><input type="text" name="speed" id="speed" /></td>
+                </tr>
+                <tr>
+                    <th><label for="rating">Rating (between 1 and 100)</label></th>
+                    <td><input type="text" name="rating" id="rating" /></td>
+                </tr>
+                <tr>
+                    <th><label for="skip_client_validation">Skip Client Validation</label></th>
+                    <td><input type="checkbox" name="skip_client_validation" id="skip_client_validation"/></td>
                 </tr>
                 <tr>
                     <th></th>
