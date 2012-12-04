@@ -14,30 +14,35 @@ jQuery(document).ready(function($) {
             // Remove previous submit handler that blocked submission.
             form.off("submit");
 
-            var validator = form.validate({
+            var submitHandler = function() {
+                // Disable the submit button while posting.
+                var submit = form.find(":submit").attr("disabled", "disabled");
+
+                // Submit the data to the server.
+                $.post(form.attr("action") || "", form.serialize(), "json")
+                    .done(function(response) {
+                        if (response.successful) {
+                            alert("Form submission was successful.")
+                        } else {
+                            alert("Form submission has failed.")
+                        }
+                    })
+                    .fail(function() {
+                        alert("Failed to communicate with server.");
+                    })
+                    .always(function() {
+                        // Enable the submit button after posting.
+                        submit.removeAttr("disabled");
+                    });
+            };
+
+            form.validate({
                 rules: rules,
-                submitHandler: function() {
-                    var skip = form.find("#skip_client_validation").is(":checked");
-                    if (skip || validator.form()) {
-                        // Disable the submit button while posting.
-                        var submit = form.find(":submit").attr("disabled", "disabled");
-                        $.post(form.attr("action") || "", form.serialize(), "json")
-                            .done(function(response) {
-                                if (response.successful) {
-                                    alert("Form submission was successful.")
-                                } else {
-                                    alert("Form submission has failed.")
-                                }
-                            })
-                            .fail(function() {
-                                alert("Failed to communicate with server.");
-                            })
-                            .always(function() {
-                                // Enable the submit button after posting.
-                                submit.removeAttr("disabled");
-                            });
+                submitHandler: submitHandler,
+                invalidHandler: function() {
+                    if (form.find("#skip_client_validation").is(":checked")) {
+                        submitHandler();
                     }
-                    return false;
                 }
             });
         });
