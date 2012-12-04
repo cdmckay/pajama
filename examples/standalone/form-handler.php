@@ -19,12 +19,16 @@ $rules = array(
     ),
 );
 
-// Create the validator.
-$validator = Validator::validate(array(
+$successful = null;
+Validator::validate(array(
     'model' => $_POST,
     'rules' => $rules,
+    'validHandler' => function() use(&$successful) {
+        $successful = 1;
+    },
+    'invalidHandler' => function() use(&$successful) {
+        $successful = 0;
+    }
 ));
-
-$successful = $validator->model();
 
 header('Location: form.php?successful=' . ($successful ? 1 : 0));

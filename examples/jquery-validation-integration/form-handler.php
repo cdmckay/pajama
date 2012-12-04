@@ -11,18 +11,17 @@ Validator::addMethod('alphanumeric', function(ValidatorContext $context, $value)
 
 $rules = json_decode(file_get_contents(__DIR__ . '/rules.json'), true);
 
-// Create the validator.
-$validator = Validator::validate(array(
+$response = array();
+Validator::validate(array(
     'model' => $_POST,
     'rules' => $rules,
+    'validHandler' => function() use(&$response) {
+        $response['successful'] = true;
+    },
+    'invalidHandler' => function() use(&$response) {
+        $response['successful'] = false;
+    },
 ));
-
-$response = array();
-if ($validator->model()) {
-    $response['successful'] = true;
-} else {
-    $response['successful'] = false;
-}
 
 header('Content-Type: application/json');
 echo json_encode($response);

@@ -41,7 +41,18 @@ final class Validator {
     }
 
     public static function validate($options) {
-        return new Validator($options['model'], $options['rules']);
+        $noop = function() {};
+        $valid_handler = $options['validHandler'] ?: $noop;
+        $invalid_handler = $options['invalidHandler'] ?: $noop;
+
+        $validator = new Validator($options['model'], $options['rules']);
+        if ($validator->model()) {
+            $valid_handler($validator);
+        } else {
+            $invalid_handler($validator);
+        }
+
+        return $validator;
     }
 
     public static function getMethods() {
