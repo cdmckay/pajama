@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../pajama-validator.php';
+require_once __DIR__ . '/../../pajama.php';
 
 use \Pajama\Validator;
 use \Pajama\ValidatorContext;
