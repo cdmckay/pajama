@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title>Pajama</title>
+    <parser>
+        <target>docs</target>
+    </parser>
+    <transformer>
+        <target>docs</target>
+    </transformer>
+    <transformations>
+        <template name="responsive" />
+    </transformations>
+    <files>
+        <file>pajama.php</file>
+    </files>
+</phpdoc>
