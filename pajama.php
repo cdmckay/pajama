@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * A PHP model validator compatible with the jQuery Validation plugin that allows for shared validation
+ * rules (in JSON) between JavaScript and PHP.
+ *
+ * @package Pajama
+ */
 namespace Pajama;
 
 /**
@@ -13,12 +18,12 @@ final class Validator {
     private $model;
 
     /**
-     * @var array The normalized rules for this Validator instance.
+     * @var array The normalized rules for this instance.
      */
     private $rules;
 
     /**
-     * @var ValidatorContext The context for this Validator instance.
+     * @var ValidatorContext A reference to the context for this instance.
      */
     private $context;
 
@@ -67,8 +72,42 @@ final class Validator {
     /**
      * Validates the model, returning a reusable Validator object in the process.
      *
-     * @param array $options
-     * @return Validator
+     * Example (using callbacks):
+     * <code>
+     * Validator::validate(array(
+     *     'model' => $_POST,
+     *     'rules' => array(...),
+     *     'validHandler' => function() {
+     *         // Model validated.
+     *     },
+     *     'invalidHandler' => function() {
+     *         // Model failed validation.
+     *     },
+     * ));
+     * </code>
+     *
+     * Example (using methods):
+     * <code>
+     * $validator = Validator::validate(array(
+     *     'model' => $_POST,
+     *     'rules' => array(...),
+     * ));
+     * if ($validator->model()) {
+     *     // Model validated.
+     * } else {
+     *     // Model failed validation.
+     * }
+     * </code>
+     *
+     * Possible options include:
+     *
+     * - <b>model</b> (required) The model to validate.
+     * - <b>rules</b> (required) The rules the model is validated against.
+     * - <b>validHandler</b> A callable that gets called if the model is valid.
+     * - <b>invalidHandler</b> A callable that gets called if the model fails validation.
+     *
+     * @param array $options An array of options.
+     * @return Validator An reusable Validator instance.
      */
     public static function validate($options) {
         $noop = function() {};
@@ -92,14 +131,14 @@ final class Validator {
      * @return array
      */
     private function normalizeRules($rules) {
-        foreach ($rules as $field => $rule) {
+        foreach ($rules as $name => $rule) {
             $normalized_rule = $this->normalizeRule($rule);
             foreach ($normalized_rule as $method_name => $param) {
                 if ($param === false) {
                     unset($normalized_rule[$method_name]);
                 }
             }
-            $rules[$field] = $normalized_rule;
+            $rules[$name] = $normalized_rule;
         }
         return $rules;
     }
@@ -123,12 +162,20 @@ final class Validator {
     }
 
     /**
-     * Validates a field, returning true if valid, false otherwise.
+     * Validates a single field.
      *
-     * This is the rough equivalent of the "element" method in the jQuery Validation plugin.
+     * This is the rough equivalent of the 'element' method in the jQuery Validation plugin.
      *
-     * @param string $name
-     * @return bool
+     * Example:
+     * <code>
+     * $validator = Validator::validate(array(...));
+     * if ($validator->field('first_name')) {
+     *     // The 'first_name' field is valid.
+     * }
+     * </code>
+     *
+     * @param string $name The name of the field to validate.
+     * @return bool True if valid, false otherwise.
      */
     public function field($name) {
         $value = $this->model[$name];
@@ -143,7 +190,19 @@ final class Validator {
     }
 
     /**
-     * @return bool
+     * Validates the model.
+     *
+     * This is the rough equivalent of the 'form' method in the jQuery Validation plugin.
+     *
+     * Example:
+     * <code>
+     * $validator = Validator::validate(array(...));
+     * if ($validator->model()) {
+     *     // Model validated.
+     * }
+     * </code>
+     *
+     * @return bool True if the model is valid, false otherwise.
      */
     public function model() {
         $valid = true;
@@ -155,41 +214,65 @@ final class Validator {
     }
 
     /**
-     * @return array
+     * Returns an associative array of all fields in the model that failed validation.
+     *
+     * Example:
+     * <code>
+     * $validator = Validator::validate(array(...));
+     * foreach ($validator->invalidFields() as $name => $value) {
+     *     error_log($name . ' did not validate.');
+     * }
+     * </code>
+     *
+     * @return array An associative array of all invalid fields.
      */
-    public function invalids() {
+    public function invalidFields() {
         $invalids = array();
         foreach ($this->rules as $name => $rule) {
-            if (!$this->field($this->model, $name)) {
-                $invalids[] = $name;
+            if (!$this->field($name)) {
+                $invalids[$name] = $this->model[$name];
             }
         }
         return $invalids;
     }
 
     /**
-     * @return int
+     * Returns the number of fields that failed validation.
+     *
+     * Example:
+     * <code>
+     * $validator = Validator::validate(array(...));
+     * error_log($validator->numberOfInvalidFields() . ' failed validation.');
+     * </code>
+     *
+     * @return int The number of fields that failed validation.
      */
-    public function numberOfInvalids() {
-        return count($this->invalids($this->model));
+    public function numberOfInvalidFields() {
+        return count($this->invalidFields($this->model));
     }
 
     /**
-     * @return array
+     * Returns the flattened model the Validator was constructed with.
+     *
+     * @return array The flattened model.
      */
     public function getModel() {
         return $this->model;
     }
 
     /**
-     * @return array
+     * Returns the normalized rules the Validator was constructed with.
+     *
+     * @return array The normalized rules.
      */
     public function getRules() {
         return $this->rules;
     }
 
     /**
-     * @return array
+     * Returns the array of validation methods.
+     *
+     * @return array The array containing all the validation methods.
      */
     public static function getMethods() {
         return self::$methods;
@@ -197,6 +280,13 @@ final class Validator {
 
     /**
      * Adds a new validation method.
+     *
+     * Example:
+     * <code>
+     * Validator::addMethod('alphanumeric', function(ValidatorContext $context, $value) {
+     *     return $context->optional($value) || ctype_alnum($value);
+     * });
+     * </code>
      *
      * @param string $method_name The name of the method, i.e. 'range' or 'creditcard'.
      * @param callable $method The validation method, typically an anonymous function.
@@ -212,16 +302,30 @@ final class Validator {
  */
 final class ValidatorContext {
 
+    /**
+     * @var Validator The Validator instance that this context is being provided for.
+     */
     private $validator;
 
+    /**
+     * @param Validator $validator
+     */
     public function __construct(Validator $validator) {
         $this->validator = $validator;
     }
 
+    /**
+     * @param string $value
+     * @return bool
+     */
     public function optional($value) {
         return is_null($value) || $value === "";
     }
 
+    /**
+     * @param string $selector
+     * @return array|null
+     */
     public function parseSelector($selector) {
         $selector = str_replace(array('\[', '\]'), array('[', ']'), $selector);
         $result = null;
@@ -235,6 +339,11 @@ final class ValidatorContext {
         return $result;
     }
 
+    /**
+     * @param string $value
+     * @param bool|string|callable $param
+     * @return bool
+     */
     public function resolve($value, $param) {
         $result = false;
         if (is_bool($param)) {
@@ -247,6 +356,10 @@ final class ValidatorContext {
         return $result;
     }
 
+    /**
+     * @param string $expression
+     * @return bool
+     */
     public function resolveExpression($expression) {
         // Supports the selectors:
         // #X
@@ -288,6 +401,9 @@ final class ValidatorContext {
         return $result;
     }
 
+    /**
+     * @return Validator
+     */
     public function getValidator() {
         return $this->validator;
     }
