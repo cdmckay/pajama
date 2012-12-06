@@ -41,7 +41,7 @@ $validator = \Pajama\Validator::validate(array(
     },
     'invalidHandler' => function() {
         // Model failed validation.
-    }
+    },
 ));
 
 // ...or methods.
@@ -56,7 +56,56 @@ See the `standalone` example in the `examples` folder.
 
 ## Custom Validators
 
-## API Similarities
+
 
 ## Limitations
 
+Since Pajama has no access to the submitting form's DOM context, it only has limited support for CSS selectors.
+
+For example, consider this mark-up:
+
+```html
+<form>
+    <div class="checkbox-group">
+        <label><input type="checkbox" name="foo[0]" value="bar" />Bar</label>
+        <label><input type="checkbox" name="foo[1]" value="baz" />Baz</label>
+    </div>
+</form>
+```
+
+
+The jQuery Validation plugin [required](http://docs.jquery.com/Plugins/Validation/Methods/required)
+validation method can support arbitrary jQuery selectors like this:
+
+```javascript
+{
+    "email": {
+        "required":".checkbox-group :checkbox:first:checked"
+        "email":true
+    }
+}
+```
+
+However, the best we could do in Pajama could do is this:
+
+```javascript
+{
+    "email": {
+        "required":"[name=foo[0]]:checked"
+        "email":true
+    }
+}
+```
+
+In general, Pajama can only recognize selectors with the form `#foo` or `[name=foo]` and the following pseudo-classes:
+
+* `:checked`
+* `:unchecked`
+* `:filled`
+* `:blank`
+
+In the case of `#foo`, Pajama assumes that the `name` and the `id` of the element were the same, as in:
+
+```html
+<input type="text" name="foo" id="foo" />
+```
