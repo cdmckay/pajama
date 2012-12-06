@@ -10,7 +10,7 @@ be similar and thus familiar to developers who already know how to use the jQuer
 For more information on using the Pajama API, please [refer to the documentation](http://cdmckay.org/pajama/docs/namespaces/Pajama.html).
 
 For documentation on the validation methods (like required, min, max, etc.) refer to the
-[jQuery Validation plugin](http://docs.jquery.com/Plugins/Validation#List_of_built-in_Validation_methods) documentation.
+[jQuery Validation plugin documentation](http://docs.jquery.com/Plugins/Validation#List_of_built-in_Validation_methods).
 
 ## Getting Started (jQuery Validation integration)
 
