@@ -18,8 +18,9 @@ Validator::validate(array(
     'validHandler' => function() use(&$response) {
         $response['successful'] = true;
     },
-    'invalidHandler' => function() use(&$response) {
+    'invalidHandler' => function(Validator $validator) use(&$response) {
         $response['successful'] = false;
+        $response['invalid_field_names'] = array_keys($validator->invalidFields());
     },
 ));
 

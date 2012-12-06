@@ -308,6 +308,8 @@ final class ValidatorContext {
     private $validator;
 
     /**
+     * Creates a new ValidatorContext instance for a given Validator.
+     *
      * @param Validator $validator
      */
     public function __construct(Validator $validator) {
@@ -315,16 +317,47 @@ final class ValidatorContext {
     }
 
     /**
-     * @param string $value
-     * @return bool
+     * Tests whether the given value is null or an empty string.
+     *
+     * Example:
+     * <code>
+     * Validator::addMethod('example', function($context, $value) {
+     *     return $context->optional($value) || ...;
+     * }
+     * </code>
+     *
+     * @param string $value The value to test.
+     * @return bool True if the value is null or an empty string, false otherwise.
      */
     public function optional($value) {
-        return is_null($value) || $value === "";
+        return is_null($value) || $value === '';
     }
 
     /**
-     * @param string $selector
-     * @return array|null
+     * Parses a Pajama-compatible selector into two parts.
+     *
+     * A Pajama-compatible selector has the format:
+     *
+     * - #foo
+     * - #foo:bar
+     * - [name=foo]
+     * - [name=foo]:bar
+     *
+     * The two parts are:
+     *
+     * - <b>name</b> The field name in the selector.
+     * - <b>pseudo-class</b> The pseudo-class portion of the selector.
+     *
+     * Example:
+     * <code>
+     * $context = ...;
+     * $parts = $context->parseSelector('[name=foo]:checked]');
+     * // $parts['name'] === 'foo'
+     * // $parts['pseudo-class'] === 'checked'
+     * </code>
+     *
+     * @param string $selector A Pajama-compatible selector.
+     * @return array|null An array containing the two parts of the selector or null if the selector could not be parsed.
      */
     public function parseSelector($selector) {
         $selector = str_replace(array('\[', '\]'), array('[', ']'), $selector);
@@ -340,8 +373,14 @@ final class ValidatorContext {
     }
 
     /**
-     * @param string $value
-     * @param bool|string|callable $param
+     * Resolves the param into a boolean value.
+     *
+     * - If the <b>param</b> is a boolean, it will be returned untouched.
+     * - If the <b>param</b> is a string, it will be parsed as a Pajama-compatible selector.
+     * - If the <b>param</b> is a callable, it will be called with the passed <b>value</b>.
+     *
+     * @param string $value The value to be passed to the param if it is a callable.
+     * @param bool|string|callable $param The parameter to resolve.
      * @return bool
      */
     public function resolve($value, $param) {
@@ -351,24 +390,18 @@ final class ValidatorContext {
         } else if (is_string($param)) {
             $result = $this->resolveExpression($param);
         } else if (is_callable($param)) {
-            $result = $param($this->validator->getModel(), $value);
+            $result = $param($this->validator, $value);
         }
         return $result;
     }
 
     /**
+     * Resolve a Pajama-compatible selector expression based on the model values.
+     *
      * @param string $expression
      * @return bool
      */
-    public function resolveExpression($expression) {
-        // Supports the selectors:
-        // #X
-        // [name=X]
-        // with pseudo-classes:
-        // :checked
-        // :unchecked
-        // :filled
-        // :blank
+    private function resolveExpression($expression) {
         $result = false;
         $parts = $this->parseSelector($expression);
         if ($parts !== null) {
@@ -402,6 +435,8 @@ final class ValidatorContext {
     }
 
     /**
+     * Returns the Validator instance associated with this context.
+     *
      * @return Validator
      */
     public function getValidator() {

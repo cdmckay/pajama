@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
                         if (response.successful) {
                             alert("Form submission was successful.")
                         } else {
-                            alert("Form submission has failed.")
+                            alert("Form submission has failed with " + response.invalid_field_names.length + " invalid field(s).")
                         }
                     })
                     .fail(function() {

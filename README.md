@@ -32,12 +32,19 @@ $rules = array(
     ),
 );
 
-// Create the validator.
+// Validate with callbacks...
 $validator = \Pajama\Validator::validate(array(
     'model' => $_POST,
     'rules' => $rules,
+    'validHandler' => function() {
+        // Model validated.
+    },
+    'invalidHandler' => function() {
+        // Model failed validation.
+    }
 ));
 
+// ...or methods.
 if($validator->model()) {
     // Model validated.
 } else {
