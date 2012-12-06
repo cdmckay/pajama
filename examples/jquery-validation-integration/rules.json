@@ -35,7 +35,7 @@
         "range":[1, 100]
     },
     "md5_hash":{
-        "alphanumeric":true,
+        "regex":"^[A-Fa-f0-9]+$",
         "rangelength":[32, 32]
     }
 }

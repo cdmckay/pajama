@@ -9,9 +9,12 @@ be similar and thus familiar to developers who already know how to use the jQuer
 
 For more information on using the Pajama API, please [refer to the documentation](http://cdmckay.org/pajama/docs/namespaces/Pajama.html).
 
+For documentation on the validation methods (like required, min, max, etc.) refer to the
+[jQuery Validation plugin](http://docs.jquery.com/Plugins/Validation#List_of_built-in_Validation_methods) documentation.
+
 ## Getting Started (jQuery Validation integration)
 
-First, get [jQuery](http://jquery.com/) and the [jQuery Validation plugin](http://bassistance.de/jquery-plugins/jquery-plugin-validation/).
+First, get [jQuery](http://code.jquery.com/jquery-latest.js) and the [jQuery Validation plugin](http://bassistance.de/jquery-plugins/jquery-plugin-validation/).
 
 Next, create a `rules.json` file:
 
@@ -107,7 +110,36 @@ See the `standalone` example in the `examples` folder.
 
 ## Custom Validators
 
-...
+Like the jQuery Validation plugin, Pajama can be extended via custom validators. To create a custom validator, use the
+[addMethod](http://cdmckay.org/pajama/docs/classes/Pajama.Validator.html#method_addMethod) static method like so:
+
+```php
+\Pajama\Validator::addMethod('regex', function($validator, $value, $param)) {
+    return $this->optional($value) || preg_match('/' . $param . '/', $value);
+});
+
+\Pajama\Validator::validate(array(
+    'model' => $_POST,
+    'rules' => array(
+        'md5_hash' => array(
+            'required' => true,
+            'regex' => '/^[A-Fa-f0-9]+$/',
+        ),
+    ),
+    'validHandler' => function() {
+        // ...
+    },
+));
+```
+
+Remember that if you're using Pajama with the jQuery Validation plugin, you must also write a JavaScript version of
+the validation method:
+
+```javascript
+$.validator.addMethod("regex", function(value, element, param) {
+    return this.optional(element) || new RegExp(param).test(value);
+}, "This field does not conform to a pattern.");
+```
 
 ## Limitations
 
@@ -137,7 +169,7 @@ validation method can support arbitrary jQuery selectors like this:
 }
 ```
 
-However, the best we could do in Pajama could do is this:
+However, the best Pajama can do is this:
 
 ```javascript
 {
