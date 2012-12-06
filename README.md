@@ -7,9 +7,60 @@ It can also be used for standalone server-side validation in a pinch.
 Since the goal of Pajama was to be used with the jQuery Validation plugin, the API has been designed to
 be similar and thus familiar to developers who already know how to use the jQuery Validation plugin.
 
+For more information on using the Pajama API, please [refer to the documentation](http://cdmckay.org/pajama/docs/namespaces/Pajama.html).
+
 ## Getting Started (jQuery Validation integration)
 
-This will be filled in soon.
+First, get [jQuery](http://jquery.com/) and the [jQuery Validation plugin](http://bassistance.de/jquery-plugins/jquery-plugin-validation/).
+
+Next, create a `rules.json` file:
+
+```javascript
+{
+    "rating":{
+        "required":true,
+        "range":[1, 100]
+    }
+}
+```
+
+Now, include jQuery and the jQuery Validation plugin on a page:
+
+```html
+<html>
+    <head>
+        <title>Getting Started</title>
+        <script type="text/javascript" src="jquery.js"></script>
+        <script type="text/javascript" src="jquery.validate.js"></script>
+    </head>
+    <body>
+        <form method="post" action="form-handler.php">
+            <label>Rating: <input type="text" name="rating" /></label>
+        </form>
+        <script type="text/javascript">
+        $.getJSON("rules.json", function(rules) {
+            $("form").validate({ rules: rules });
+        });
+        </script>
+    </body>
+</html>
+```
+
+Finally, create a PHP script to handle the form submission:
+
+```php
+require_once 'pajama.php';
+
+\Pajama\Validator::validate(array(
+    'model' => $_POST,
+    'rules' => json_decode('rules.json', true),
+    'validHandler' => function() {
+        // Store rating in database.
+    },
+));
+```
+
+For a more detailed example, see the `jquery-validation-integration` example in the `examples` folder.
 
 ## Getting Started (standalone)
 
@@ -56,7 +107,7 @@ See the `standalone` example in the `examples` folder.
 
 ## Custom Validators
 
-
+...
 
 ## Limitations
 
