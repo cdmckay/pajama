@@ -114,8 +114,8 @@ Like the jQuery Validation plugin, Pajama can be extended via custom validators.
 [addMethod](http://cdmckay.org/pajama/docs/classes/Pajama.Validator.html#method_addMethod) static method like so:
 
 ```php
-\Pajama\Validator::addMethod('regex', function($validator, $value, $param)) {
-    return $this->optional($value) || preg_match('/' . $param . '/', $value);
+\Pajama\Validator::addMethod('regex', function($context, $value, $param)) {
+    return $context->optional($value) || preg_match('/' . $param . '/', $value);
 });
 
 \Pajama\Validator::validate(array(
