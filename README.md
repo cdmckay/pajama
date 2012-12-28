@@ -123,7 +123,7 @@ Like the jQuery Validation plugin, Pajama can be extended via custom validators.
     'rules' => array(
         'md5_hash' => array(
             'required' => true,
-            'regex' => '/^[A-Fa-f0-9]+$/',
+            'regex' => '^[A-Fa-f0-9]+$',
         ),
     ),
     'validHandler' => function() {
