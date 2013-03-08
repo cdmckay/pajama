@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../../pajama.php';
 
-use \Pajama\Validator;
+use \Cdmckay\Pajama\Validator;
 
 $rules = array(
     'first_name' => 'required',

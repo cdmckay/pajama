@@ -54,7 +54,7 @@ Finally, create a PHP script to handle the form submission:
 ```php
 require_once 'pajama.php';
 
-\Pajama\Validator::validate(array(
+\Cdmckay\Pajama\Validator::validate(array(
     'model' => $_POST,
     'rules' => json_decode('rules.json', true),
     'validHandler' => function() {
@@ -87,7 +87,7 @@ $rules = array(
 );
 
 // Validate with callbacks...
-$validator = \Pajama\Validator::validate(array(
+$validator = \Cdmckay\Pajama\Validator::validate(array(
     'model' => $_POST,
     'rules' => $rules,
     'validHandler' => function() {
@@ -114,11 +114,11 @@ Like the jQuery Validation plugin, Pajama can be extended via custom validators.
 [addMethod](http://cdmckay.org/pajama/docs/classes/Pajama.Validator.html#method_addMethod) static method like so:
 
 ```php
-\Pajama\Validator::addMethod('regex', function($context, $value, $param)) {
+\Cdmckay\Pajama\Validator::addMethod('regex', function($context, $value, $param)) {
     return $context->optional($value) || preg_match('/' . $param . '/', $value);
 });
 
-\Pajama\Validator::validate(array(
+\Cdmckay\Pajama\Validator::validate(array(
     'model' => $_POST,
     'rules' => array(
         'md5_hash' => array(

@@ -5,7 +5,7 @@
  *
  * @package Pajama
  */
-namespace Pajama;
+namespace Cdmckay\Pajama;
 
 /**
  * A class for validating array models, typically the <code>$_POST</code> or <code>$_GET</code> superglobals.

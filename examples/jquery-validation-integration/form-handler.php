@@ -2,8 +2,8 @@
 
 require_once __DIR__ . '/../../pajama.php';
 
-use \Pajama\Validator;
-use \Pajama\ValidatorContext;
+use \Cdmckay\Pajama\Validator;
+use \Cdmckay\Pajama\ValidatorContext;
 
 Validator::addMethod('regex', function(ValidatorContext $context, $value, $param) {
     return $context->optional($value) || preg_match('/' . $param . '/', $value);
