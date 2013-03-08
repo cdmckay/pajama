@@ -11,6 +11,7 @@
         <template name="responsive" />
     </transformations>
     <files>
-        <file>pajama.php</file>
+        <file>Validator.php</file>
+        <file>ValidatorContext.php</file>
     </files>
 </phpdoc>
