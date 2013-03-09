@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../pajama.php';
+require 'vendor/autoload.php';
 
 use \Cdmckay\Pajama\Validator;
 use \Cdmckay\Pajama\ValidatorContext;

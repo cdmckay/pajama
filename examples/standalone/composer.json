@@ -1,0 +1,5 @@
+{
+    "require": {
+        "cdmckay/pajama": "dev-master"
+    }
+}

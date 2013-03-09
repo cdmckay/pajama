@@ -11,6 +11,8 @@
 
 namespace Cdmckay\Pajama;
 
+use Cdmckay\Pajama\Validator;
+
 /**
  * Provided to each validation method to provide useful methods and validation context information.
  */

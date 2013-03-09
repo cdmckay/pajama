@@ -52,7 +52,8 @@ Now, include jQuery and the jQuery Validation plugin on a page:
 Finally, create a PHP script to handle the form submission:
 
 ```php
-require 'vendor/autoload.php';
+require 'ValidatorContext.php';
+require 'Validator.php';
 
 \Cdmckay\Pajama\Validator::validate(array(
     'model' => $_POST,
