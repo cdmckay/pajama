@@ -80,7 +80,7 @@ final class ValidatorContext {
             preg_match('/^\[name=([\w\-\.\[\]]+)\](:\w+)?$/', $selector, $matches)) {
             $result = array(
                 'name' => $matches[1],
-                'pseudo-class' => $matches[2],
+                'pseudo-class' => isset($matches[2]) ? $matches[2] : null,
             );
         }
         return $result;
