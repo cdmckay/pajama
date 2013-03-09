@@ -12,6 +12,18 @@ For more information on using the Pajama API, please [refer to the documentation
 For documentation on the validation methods (like required, min, max, etc.) refer to the
 [jQuery Validation plugin documentation](http://docs.jquery.com/Plugins/Validation#List_of_built-in_Validation_methods).
 
+Pajama is now [Composer](http://getcomposer.org/)-compatible and available on [Packagist](https://packagist.org/packages/cdmckay/pajama).
+Simply add this line to your `composer.json` to use it:
+
+```javascript
+{
+    "require": {
+        ...
+        "cdmckay/pajama": "dev-master"
+    }
+}
+```
+
 ## Getting Started (jQuery Validation integration)
 
 First, get [jQuery](http://code.jquery.com/jquery-latest.js) and the [jQuery Validation plugin](http://bassistance.de/jquery-plugins/jquery-plugin-validation/).
