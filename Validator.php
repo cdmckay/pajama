@@ -184,7 +184,7 @@ final class Validator {
      * @return bool True if valid, false otherwise.
      */
     public function field($name) {
-        $value = $this->model[$name];
+        $value = isset($this->model[$name]) ? $this->model[$name] : null;
         $rule = $this->rules[$name];
         $valid = true;
         foreach ($rule as $method_name => $param) {
@@ -236,7 +236,7 @@ final class Validator {
         $invalids = array();
         foreach ($this->rules as $name => $rule) {
             if (!$this->field($name)) {
-                $invalids[$name] = $this->model[$name];
+                $invalids[$name] = isset($this->model[$name]) ? $this->model[$name] : null;
             }
         }
         return $invalids;
@@ -400,7 +400,7 @@ Validator::addMethod('equalTo', function(ValidatorContext $context, $value, $par
     if ($parts !== null) {
         $name = $parts['name'];
         $model = $context->getValidator()->getModel();
-        $valid = $value === $model[$name];
+        $valid = $value === isset($model[$name]) ? $model[$name] : null;
     }
     return $valid;
 });
